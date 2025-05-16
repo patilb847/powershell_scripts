@@ -10,6 +10,6 @@ $_.LastWriteTime -lt $check_date
 })
 
 foreach($file in $files){
-    #Remove-Item -Path $file.FullName -Force
+    Remove-Item -Path $file.FullName -Force
     $file.FullName +" Deleted on "+$Today | Out-File $log_file -Append
 }
