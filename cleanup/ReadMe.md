@@ -1,1 +1,0 @@
-this script deletes files older than 30 days from target path.
