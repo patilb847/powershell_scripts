@@ -1,0 +1,1 @@
+This script uses csv file to create local user accounts and stores log for each day.
