@@ -45,13 +45,13 @@ while($continue_flag -eq $true){
             try{
                 $new_user=New-LocalUser -Name $user_name -Password ($password) -FullName "$first_name $last_name" -ErrorAction Stop
                 "==========================================================================="
-                "[ $((Get-Date -Format dd-MM-yyyy)) $((Get-Date -Format HH:mm:ss)) ] successfully created user $($user_name)" | Out-File $log_file -Append
-                "[ $((Get-Date -Format dd-MM-yyyy)) $((Get-Date -Format HH:mm:ss)) ] successfully created user $($user_name)"
+                "[$((Get-Date -Format dd-MM-yyyy)) $((Get-Date -Format HH:mm:ss))] successfully created user $($user_name)" | Out-File $log_file -Append
+                "[$((Get-Date -Format dd-MM-yyyy)) $((Get-Date -Format HH:mm:ss))] successfully created user $($user_name)"
                 "==========================================================================="
             }catch{
                 "==========================================================================="
-                "[ $((Get-Date -Format dd-MM-yyyy)) $((Get-Date -Format HH:mm:ss))] failed to create user $($user_name), following error occured $($_.exception.message)" | Out-File $log_file -Append
-                "[ $((Get-Date -Format dd-MM-yyyy)) $((Get-Date -Format HH:mm:ss))] failed to create user $($user_name), following error occured $($_.exception.message)"
+                "[$((Get-Date -Format dd-MM-yyyy)) $((Get-Date -Format HH:mm:ss))] failed to create user $($user_name), following error occured $($_.exception.message)" | Out-File $log_file -Append
+                "[$((Get-Date -Format dd-MM-yyyy)) $((Get-Date -Format HH:mm:ss))] failed to create user $($user_name), following error occured $($_.exception.message)"
                 "==========================================================================="
             }
         }else{
