@@ -3,6 +3,23 @@ $log_file="C:\Users\Administrator\powershell_scripts\MonitoringScript\monitoring
 $user_csv="C:\Users\Administrator\powershell_scripts\MonitoringScript\users.csv",
 $services_csv="C:\Users\Administrator\powershell_scripts\MonitoringScript\services.csv"
 )
+Function Write-log{
+param(
+    $message,
+    $section
+)
+    $timestamp = "[$(Get-Date -Format dd-MM-yyyy) $(Get-Date -Format HH:mm:ss)]"
+    $header = "##############$section##############"
+    $logMessage = "$timestamp $message"
+
+    $header | Out-File $log_file -Append
+    $logMessage | Out-File $log_file -Append
+
+    $header
+    $logMessage
+
+}
+
 Function storage-alert{
     
     try{
@@ -16,17 +33,11 @@ Function storage-alert{
 
             $free=($remaining_size/$size)*100
             if($free -le 20){
-                "##############Storage Monitor##############"|Out-File $log_file -Append
-                "##############Storage Monitor##############"
-                "[$(Get-Date -Format dd-MM-yyyy) $(Get-Date -Format HH:mm:ss)] ALERT: $drive_letter drive has $($free)% free storage left, Total storage=$([Math]::Round($($size/1GB)))GB Remaining storage=$([Math]::Round($($remaining_size/1GB)))GB" | Out-File $log_file -Append
-                "[$(Get-Date -Format dd-MM-yyyy) $(Get-Date -Format HH:mm:ss)] ALERT: $drive_letter drive has $($free)% free storage left, Total storage=$([Math]::Round($($size/1GB)))GB Remaining storage=$([Math]::Round($($remaining_size/1GB)))GB"
+                Write-log -message "ALERT: $drive_letter drive has $($free)% free storage left, Total storage=$([Math]::Round($($size/1GB)))GB Remaining storage=$([Math]::Round($($remaining_size/1GB)))GB" -section "Storage Monitor"
             }
         }
      }catch{
-        "##############Storage Monitor##############"|Out-File $log_file -Append
-        "##############Storage Monitor##############"
-        "[$(Get-Date -Format dd-MM-yyyy) $(Get-Date -Format HH:mm:ss)] Error: $($_.exception.message) Occured while checking storage" | Out-File $log_file -Append
-        "[$(Get-Date -Format dd-MM-yyyy) $(Get-Date -Format HH:mm:ss)] Error: $($_.exception.message) Occured while checking storage"
+        Write-log -message "Error: $($_.exception.message) Occured while checking storage" -section "Storage Monitor"
      }
 }
 
@@ -38,23 +49,16 @@ param(
         $user=get-localuser -Name $user_name |select * -ErrorAction stop
 
         if($user.Enabled -eq $false){
-            "##############User Validation##############"|Out-File $log_file -Append
-            "##############User Validation##############"
-            "[$(Get-Date -Format dd-MM-yyyy) $(Get-Date -Format HH:mm:ss)] ALERT: user $user_name is in disabled state" | Out-File $log_file -Append
-            "[$(Get-Date -Format dd-MM-yyyy) $(Get-Date -Format HH:mm:ss)] ALERT: user $user_name is in disabled state"
+            Write-log -message "ALERT: user $user_name is in disabled state" -section "User Validation"
         }
 
     }catch{
         "##############User Validation##############"|Out-File $log_file -Append
         "##############User Validation##############"
         if($_.exception.message -like "not found"){
-
-            "[$(Get-Date -Format dd-MM-yyyy) $(Get-Date -Format HH:mm:ss)] ALERT: $user_name does not exist" | Out-File $log_file -Append
-            "[$(Get-Date -Format dd-MM-yyyy) $(Get-Date -Format HH:mm:ss)] ALERT: $user_name does not exist"
+            Write-log -message "ALERT: $user_name does not exist" -section "User Validation"
         }else{
-            
-            "[$(Get-Date -Format dd-MM-yyyy) $(Get-Date -Format HH:mm:ss)] Error: $($_.exception.message) Occured while validating local user"| Out-File $log_file -Append
-            "[$(Get-Date -Format dd-MM-yyyy) $(Get-Date -Format HH:mm:ss)] Error: $($_.exception.message) Occured while validating local user"
+            Write-log -message "Error: $($_.exception.message) Occured while validating local user" -section "User Validation"
         }
 
     }
@@ -68,17 +72,11 @@ param(
     try{
         $service_state=(get-service -Name $service).status
         if($service_state -ne "Running"){
-            "##############Service Monitor##############"|Out-File $log_file -Append
-            "##############Service Monitor##############"
-            "[$(Get-Date -Format dd-MM-yyyy) $(Get-Date -Format HH:mm:ss)] ALERT: service status for $service is $service_state"|Out-File $log_file -Append
-            "[$(Get-Date -Format dd-MM-yyyy) $(Get-Date -Format HH:mm:ss)] ALERT: service status for $service is $service_state"
+            Write-log -message "ALERT: service status for $service is $service_state" -section "Service Monitor"
         }
     }catch{
         if($_.exception.message -match "Cannot find any service"){
-            "##############Service Monitor##############"|Out-File $log_file -Append
-            "##############Service Monitor##############"
-            "[$(Get-Date -Format dd-MM-yyyy) $(Get-Date -Format HH:mm:ss)] ALERT: service with name $service does not exist"|out-file $log_file -Append
-            "[$(Get-Date -Format dd-MM-yyyy) $(Get-Date -Format HH:mm:ss)] ALERT: service with name $service does not exist"
+            Write-log -message "ALERT: service with name $service does not exist" -section "Service Monitor"
         }
     }
 
@@ -92,10 +90,7 @@ if(test-path $user_csv){
         validate-user -user_name $user.Username
     }
 }else{
-    "##############User Validation##############"|Out-File $log_file -Append
-    "##############User Validation##############"
-    "[$(Get-Date -Format dd-MM-yyyy) $(Get-Date -Format HH:mm:ss)] ALERT: Users csv is not present at $user_csv"|Out-File $log_file -Append
-    "[$(Get-Date -Format dd-MM-yyyy) $(Get-Date -Format HH:mm:ss)] ALERT: Users csv is not present at $user_csv"
+    Write-log -message "ALERT: Users csv is not present at $user_csv" -section "User Validation"
 }
 
 if(test-path $services_csv){
@@ -104,8 +99,5 @@ if(test-path $services_csv){
         Monitor-service -service $service.name
     }
 }else{
-    "##############Service Monitor##############"|Out-File $log_file -Append
-    "##############Service Monitor##############"
-    "[$(Get-Date -Format dd-MM-yyyy) $(Get-Date -Format HH:mm:ss)] ALERT: Services csv is not present at $user_csv"|Out-File $log_file -Append
-    "[$(Get-Date -Format dd-MM-yyyy) $(Get-Date -Format HH:mm:ss)] ALERT: Services csv is not present at $user_csv"
+    Write-log -message "ALERT: Services csv is not present at $user_csv" -section "Service Monitor"
 }
