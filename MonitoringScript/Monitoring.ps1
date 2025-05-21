@@ -53,8 +53,7 @@ param(
         }
 
     }catch{
-        "##############User Validation##############"|Out-File $log_file -Append
-        "##############User Validation##############"
+
         if($_.exception.message -like "not found"){
             Write-log -message "ALERT: $user_name does not exist" -section "User Validation"
         }else{
