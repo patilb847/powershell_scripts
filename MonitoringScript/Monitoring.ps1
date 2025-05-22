@@ -1,8 +1,13 @@
 ﻿param(
-$log_file="C:\Users\Administrator\powershell_scripts\MonitoringScript\monitoring$(Get-Date -Format ddMMyyyy)$(Get-Date -Format HHmm).log",
+$log_file="C:\Users\Administrator\powershell_scripts\MonitoringScript\logs\monitoring$(Get-Date -Format ddMMyyyy)$(Get-Date -Format HHmm).log",
 $user_csv="C:\Users\Administrator\powershell_scripts\MonitoringScript\users.csv",
 $services_csv="C:\Users\Administrator\powershell_scripts\MonitoringScript\services.csv"
 )
+$log_folder=Split-Path -Path $log_file -Parent
+if(!(Test-Path $log_folder)){
+    New-Item -Path $(Split-Path -Path $log_folder -Parent) -Name logs -ItemType Directory 
+
+}
 Function Write-log{
 param(
     $message,
